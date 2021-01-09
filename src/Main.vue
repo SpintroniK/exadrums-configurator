@@ -121,16 +121,16 @@
           <div v-bind:style="{ height: '100%', width: '100%' }" ref="container">
             <v-stage ref="stage" :config="stageSize">
               <v-layer ref="layer">
-                <v-group :config="{ draggable: true}">
+                <v-group :config="{ draggable: true}"
+                    @dragstart="handleDragStart"
+                    @dragend="handleDragEnd">
                   <v-image
                     v-for="(image, i) in images"
                     :key="i"
-                    @dragstart="handleDragStart"
-                    @dragend="handleDragEnd"
                     :config="{
                       image: image,
-                      x: 150*i,
-                      y: 150,
+                      x: 0,
+                      y: 0,
                       width: 100,
                       height: 100
                     }"
@@ -139,7 +139,7 @@
                     :config="{
                       text: 'Snare #1',
                       x: 15,
-                      y: 200,
+                      y: 50,
                       fontSize: 20,
                       fontFamily: 'Calibri',
                       fill: 'black'
@@ -151,7 +151,6 @@
           </div>
         </div>
       </div>
-
 
       <section class="section">
         <div class="container has-text-justified">
@@ -244,21 +243,23 @@
           },
           handleDragEnd(e) 
           {
+            console.log(e.target.position())
           },
           changeRect() 
           {
             const container = this.$refs.container
 
-            if(!container) {
-              return;
-            }
+            if(!container)
+              return
 
             const height = container.offsetHeight
             const width = container.offsetWidth
 
-            console.log(height, height)
+            // console.log(height, height)
             this.stageSize.width = width
             this.stageSize.height = height
+
+            // console.log(this.$refs.layer.getNode().children[0].position())
      
           }
         },
