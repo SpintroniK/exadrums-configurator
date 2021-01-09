@@ -4,6 +4,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin');
 
 const dev = process.env.NODE_ENV === 'dev'
 const dist = path.resolve(__dirname, 'dist')
@@ -74,9 +75,13 @@ if(!dev)
         }
     }))
 
-    appConfig.optimization =  {
-        minimizer: [new OptimizeCSSAssetsPlugin({})],
-      }
+    appConfig.plugins.push(new CopyPlugin(
+    {
+        patterns: [{ from: path.join(__dirname, 'assets'), to: path.join(__dirname, 'dist', 'assets') }],
+        options: { concurrency: 100 }
+    }))
+
+    appConfig.optimization =  { minimizer: [new OptimizeCSSAssetsPlugin({})] }
 }
 
 

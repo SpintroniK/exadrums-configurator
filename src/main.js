@@ -15,9 +15,14 @@ import Buefy from 'buefy'
 import { ConfigProgrammatic } from 'buefy'
 ConfigProgrammatic.setOptions({ defaultIconPack: 'fas', defaultIconComponent: 'vue-fontawesome' })
 
+import VueKonva from 'vue-konva'
+// import Vue2TouchEvents from 'vue2-touch-events'
+
 import Main from './Main.vue'
 
 Vue.use(Buefy)
+Vue.use(VueKonva)
+// Vue.use(Vue2TouchEvents)
 
 
 // Router.afterEach(() => {

@@ -70,11 +70,11 @@
               <div class="field">
                 Number of triggers: 
                 <b-field>
-                  <b-radio-button v-model="triggers_number" native-value="8">
+                  <b-radio-button v-model="nbTriggers" native-value="8">
                       <b-icon icon="drum"></b-icon>
                       <span>8 Triggers</span>
                   </b-radio-button>
-                  <b-radio-button v-model="triggers_number" native-value="16" disabled>
+                  <b-radio-button v-model="nbTriggers" native-value="16" disabled>
                       <b-icon icon="drum"></b-icon>
                       <span>16 Triggers</span>
                   </b-radio-button>
@@ -84,6 +84,74 @@
           </div>
         </div>
       </div>
+
+      <div class="container has-text-centered">
+        <h1 class="title">Customize your kit</h1>
+      </div>
+      <div class="container">
+        <div class="columns has-text-justified">
+          <div class="column">
+            <section class="section">
+              Number of triggers left: {{triggers_number}}
+            </section>
+          </div>
+          <div class="column">
+            <section class="section">
+              <b-field label="Name">
+                  <b-input v-model="currentInstrument.name"></b-input>
+              </b-field>
+              <b-field label="Type">
+                <b-select placeholder="Select a type" icon="drum" expanded>
+                  <option
+                      v-for="instrumentType in instrumentTypes"
+                      :value="instrumentType.name"
+                      :key="instrumentType.name"
+                      :selected="instrumentType.name == 'Pad'">
+                      {{ instrumentType.name }}
+                  </option>
+                </b-select>
+              </b-field>
+              <b-button icon-left="plus" type="is-primary">
+                  Add
+              </b-button>
+            </section>
+          </div>
+        </div>
+        <div class="container" id="canvas-container">
+          <div v-bind:style="{ height: '100%', width: '100%' }" ref="container">
+            <v-stage ref="stage" :config="stageSize">
+              <v-layer ref="layer">
+                <v-group :config="{ draggable: true}">
+                  <v-image
+                    v-for="(image, i) in images"
+                    :key="i"
+                    @dragstart="handleDragStart"
+                    @dragend="handleDragEnd"
+                    :config="{
+                      image: image,
+                      x: 150*i,
+                      y: 150,
+                      width: 100,
+                      height: 100
+                    }"
+                  />
+                  <v-text ref="text"
+                    :config="{
+                      text: 'Snare #1',
+                      x: 15,
+                      y: 200,
+                      fontSize: 20,
+                      fontFamily: 'Calibri',
+                      fill: 'black'
+                    }"
+                  />
+                </v-group>
+              </v-layer>
+            </v-stage>
+          </div>
+        </div>
+      </div>
+
 
       <section class="section">
         <div class="container has-text-justified">
@@ -99,15 +167,15 @@
         <div class="columns has-text-justified">
           <div class="column">
             <section class="section">
-              <b-button :label="generate_label"></b-button>
+              <b-button :label="generate_label" @click="generate_qr_code"></b-button>
             </section>
           </div>
           <div class="column">
             <section class="section">
-              <span @click="clickMe">
+              <span v-if="show_qr_code">
                 <qrcode-vue :value="value" :size="size" level="H" renderAs="canvas"></qrcode-vue>
               </span>
-              {{value}}
+              <!-- {{value}} -->
             </section>
           </div>
         </div>
@@ -128,27 +196,106 @@
   import QrcodeVue from 'qrcode.vue'
 
     export default {
-        data() {
-            return {
-                installation_method: 'package_manager',
-                value: 'https://make.exadrums.com/?id=123',
-                size: 120,
-                software_guidelines: true,
-                triggers_number: '8',
-                generate_label: 'Generate Custom User Guide'
-            }
+        data() 
+        {
+          return {
+            images: [],
+            stageSize: { width: 300, height: 300 },
+            installation_method: 'package_manager',
+            value: '',
+            size: 120,
+            software_guidelines: true,
+            triggers_number: 8,
+            generate_label: 'Generate Custom User Guide',
+            show_qr_code: false,
+            toto: 'test',
+            imageUrl: '',
+            currentInstrument: {name: 'Snare Drum', type: 'Pad', sounds: [], triggers: []},
+            instrumentTypes: [
+              {name: 'Snare Drum'},
+              {name: 'Tom'},
+              {name: 'Bass Drum'},
+              {name: 'Cymbal'}
+            ]
+          }
+        },
+        computed:
+        {
+          nbTriggers()
+          {
+            return this.triggers_number.toString()
+          }
         },
         methods:
         {
-          clickMe() {
-                this.$buefy.notification.open(`QR content: "${this.value}"`)
+          addInstrument() 
+          {
+            
+            // console.log(this.$refs.text.getNode().destroy())
+          },
+          generate_qr_code() 
+          {
+            this.show_qr_code = true
+            this.value = 'https://make.exadrums.com/?id=123'
+            this.generate_label = 'Update Custom User Guide'
+          },
+          handleDragStart(e) 
+          {
+          },
+          handleDragEnd(e) 
+          {
+          },
+          changeRect() 
+          {
+            const container = this.$refs.container
+
+            if(!container) {
+              return;
             }
+
+            const height = container.offsetHeight
+            const width = container.offsetWidth
+
+            console.log(height, height)
+            this.stageSize.width = width
+            this.stageSize.height = height
+     
+          }
         },
-    components: {
+    components: 
+    {
       QrcodeVue,
+    },
+    mounted() 
+    {
+
+      window.addEventListener("resize", this.changeRect)
+      this.changeRect()
+
+      const image = new Image()
+      image.src = './assets/images/snare.png'
+      image.onload = _ => this.images.push(image)
+
+      // const con = this.$refs.stage.getNode().container()
+
+      // con.addEventListener('dragover', e => e.preventDefault())
+      // con.addEventListener('drop', e => 
+      // {
+      //   e.preventDefault()
+      //   const image = new Image()
+      //   image.src = this.imageUrl
+      //   image.onload = _ => this.images.push(image)
+      // })
     }
   }
 </script>
+
+<style scoped>
+  #container
+  {
+    width: 100%;
+  }
+</style>
 
 
 <style lang="sass">
