@@ -97,21 +97,35 @@
           </div>
           <div class="column">
             <section class="section">
+              <h2 class="subtitle">Add instrument</h2>
               <b-field label="Name">
                   <b-input v-model="currentInstrument.name"></b-input>
               </b-field>
-              <b-field label="Type">
-                <b-select placeholder="Select a type" icon="drum" expanded>
-                  <option
-                      v-for="instrumentType in instrumentTypes"
-                      :value="instrumentType.name"
-                      :key="instrumentType.name"
-                      :selected="instrumentType.name == 'Pad'">
-                      {{ instrumentType.name }}
-                  </option>
-                </b-select>
-              </b-field>
-              <b-button icon-left="plus" type="is-primary">
+              <section>
+                <b-dropdown :scrollable="true" v-model="selectedInstrumentMenu" aria-role="list" class="mb-3">
+                    <template #trigger="{ active }">
+                        <b-button :label="selectedInstrumentMenu.text" type="is-primary" :icon-left="selectedInstrumentMenu.icon" 
+                                  :icon-right="active ? 'angle-up' : 'angle-down'" />
+                    </template>
+                    <b-dropdown-item v-for="(menu, index) in instrumentsMenu" :key="index" :value="menu" aria-role="listitem">
+                        <div class="media">
+                            <b-icon class="media-left" :icon="menu.icon"></b-icon>
+                            <div class="media-content">
+                                <h3>{{menu.text}}</h3>
+                            </div>
+                        </div>
+                    </b-dropdown-item>
+                </b-dropdown>
+              </section>
+              <section>
+                  <b-dropdown aria-role="list" v-model="selectedTriggerMenu" class="mb-3">
+                    <template #trigger="{ active }">
+                        <b-button :label="selectedTriggerMenu" type="is-primary" :icon-right="active ? 'angle-up' : 'angle-down'" />
+                    </template>
+                    <b-dropdown-item v-for="(item, index) in triggersMenu" :key="index" aria-role="listitem" :value="item">{{item}}</b-dropdown-item>
+                </b-dropdown>
+              </section>
+              <b-button icon-left="plus" type="is-primary" @click="addInstrument">
                   Add
               </b-button>
             </section>
@@ -121,30 +135,22 @@
           <div v-bind:style="{ height: '100%', width: '100%' }" ref="container">
             <v-stage ref="stage" :config="stageSize">
               <v-layer ref="layer">
-                <v-group :config="{ draggable: true}"
-                    @dragstart="handleDragStart"
-                    @dragend="handleDragEnd">
-                  <v-image
-                    v-for="(image, i) in images"
-                    :key="i"
-                    :config="{
+                <v-group :config="{ draggable: true}" @dragstart="handleDragStart" @dragend="handleDragEnd">
+                  <v-image v-for="(image, i) in images" :key="i" :config="{
                       image: image,
                       x: 0,
                       y: 0,
                       width: 100,
                       height: 100
-                    }"
-                  />
-                  <v-text ref="text"
-                    :config="{
+                    }" />
+                  <v-text ref="text" :config="{
                       text: 'Snare #1',
                       x: 15,
                       y: 50,
                       fontSize: 20,
                       fontFamily: 'Calibri',
                       fill: 'black'
-                    }"
-                  />
+                    }" />
                 </v-group>
               </v-layer>
             </v-stage>
@@ -197,6 +203,19 @@
     export default {
         data() 
         {
+          const instrumentsMenu = [
+            { icon: 'drum', text: 'Snare Drum' },
+            { icon: 'drum', text: 'Bass Drum' },
+            { icon: 'drum', text: 'Tom' },
+            { icon: 'record-vinyl', text: 'Cymbal' }
+          ]
+
+          const triggersMenu = [
+            "Pad",
+            "Dual Zone Pad",
+            "Hi-Hat"
+          ]
+
           return {
             images: [],
             stageSize: { width: 300, height: 300 },
@@ -210,12 +229,9 @@
             toto: 'test',
             imageUrl: '',
             currentInstrument: {name: 'Snare Drum', type: 'Pad', sounds: [], triggers: []},
-            instrumentTypes: [
-              {name: 'Snare Drum'},
-              {name: 'Tom'},
-              {name: 'Bass Drum'},
-              {name: 'Cymbal'}
-            ]
+            selectedInstrumentMenu: instrumentsMenu[0], instrumentsMenu: instrumentsMenu,
+            selectedTriggerMenu: triggersMenu[0], triggersMenu: triggersMenu
+
           }
         },
         computed:
@@ -231,6 +247,7 @@
           {
             
             // console.log(this.$refs.text.getNode().destroy())
+            this.$buefy.dialog.alert(`Instrument: ${this.selectedInstrumentMenu.text}<br>Trigger : ${this.selectedTriggerMenu}`)
           },
           generate_qr_code() 
           {
@@ -292,9 +309,9 @@
 </script>
 
 <style scoped>
-  #container
+  #canvas-container
   {
-    width: 100%;
+    height: 100%;
   }
 </style>
 
