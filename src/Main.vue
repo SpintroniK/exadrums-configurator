@@ -135,16 +135,17 @@
           <div v-bind:style="{ height: '100%', width: '100%' }" ref="container">
             <v-stage ref="stage" :config="stageSize">
               <v-layer ref="layer">
-                <v-group :config="{ draggable: true}" @dragstart="handleDragStart" @dragend="handleDragEnd">
-                  <v-image v-for="(image, i) in images" :key="i" :config="{
-                      image: image,
+                <v-group v-for="(instrument, i) in instruments" :key="i" 
+                         :config="{ draggable: true}" @dragstart="handleDragStart" @dragend="handleDragEnd">
+                  <v-image :config="{
+                      image: instrument.image,
                       x: 0,
                       y: 0,
                       width: 100,
                       height: 100
                     }" />
                   <v-text ref="text" :config="{
-                      text: 'Snare #1',
+                      text: instrument.text,
                       x: 15,
                       y: 50,
                       fontSize: 20,
@@ -217,7 +218,7 @@
           ]
 
           return {
-            images: [],
+            instruments: [],
             stageSize: { width: 300, height: 480 },
             installation_method: 'package_manager',
             value: '',
@@ -291,19 +292,16 @@
       this.changeRect()
 
       const image = new Image()
-      image.src = './assets/images/snare.png'
-      image.onload = _ => this.images.push(image)
+      image.src = './assets/images/snare.svg'
+      image.onload = _ => 
+      {
+        this.instruments.push({image: image, text: 'Snare #1'})
+        this.instruments.push({image: image, text: 'Snare #2'})
+        this.instruments.push({image: image, text: 'Snare #3'})
+        this.instruments.push({image: image, text: 'Snare #4'})
+      }
 
       // const con = this.$refs.stage.getNode().container()
-
-      // con.addEventListener('dragover', e => e.preventDefault())
-      // con.addEventListener('drop', e => 
-      // {
-      //   e.preventDefault()
-      //   const image = new Image()
-      //   image.src = this.imageUrl
-      //   image.onload = _ => this.images.push(image)
-      // })
     }
   }
 </script>
