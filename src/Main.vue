@@ -92,7 +92,24 @@
         <div class="columns has-text-justified">
           <div class="column">
             <section class="section">
-              Number of triggers left: {{triggers_number}}
+              Number of triggers left: {{nbTriggersLeft}}
+                  <section class="mt-3">
+                    <b-collapse class="card" animation="slide" aria-id="contentIdForA11y3">
+                      <template #trigger="props">
+                          <div class="card-header" role="button" aria-controls="contentIdForA11y3">
+                              <p class="card-header-title">
+                                  Instruments
+                              </p>
+                              <a class="card-header-icon">
+                                  <b-icon :icon="props.open ? 'angle-down' : 'angle-up'"></b-icon>
+                              </a>
+                            </div>
+                        </template>
+                      <section class="m-3" v-for="(instrument, i) in instruments" :key="i">
+                        {{instrument.text}}
+                      </section>
+                    </b-collapse>
+                </section>
             </section>
           </div>
           <div class="column">
@@ -125,7 +142,7 @@
                     <b-dropdown-item v-for="(item, index) in triggersMenu" :key="index" aria-role="listitem" :value="item">{{item.name}}</b-dropdown-item>
                 </b-dropdown>
               </section>
-              <b-button icon-left="plus" type="is-primary" @click="addInstrument">
+              <b-button icon-left="plus" type="is-primary" @click="addInstrument" :disabled="nbTriggersLeft - selectedTriggerMenu.nb_sensors < 0">
                   Add
               </b-button>
             </section>
@@ -146,8 +163,8 @@
                     }" />
                   <v-text ref="text" :config="{
                       text: instrument.text,
-                      x: 15,
-                      y: 50,
+                      x: 0,
+                      y: -15,
                       fontSize: 20,
                       fontFamily: 'Calibri',
                       fill: 'black'
@@ -212,9 +229,9 @@
           ]
 
           const triggersMenu = [
-            { name: "Pad", nb_triggers: 1},
-            { name: "Dual Zone Pad", nb_triggers: 2},
-            { name: "Hi-Hat", nb_triggers: 1}
+            { name: "Pad", nb_sensors: 1},
+            { name: "Dual Zone Pad", nb_sensors: 2},
+            { name: "Hi-Hat", nb_sensors: 1}
           ]
 
           return {
@@ -240,6 +257,20 @@
           nbTriggers()
           {
             return this.triggers_number.toString()
+          },
+          nbTriggersLeft()
+          {
+            const instrumentsTriggers = this.instruments.map(i => i.trigger)
+
+            let nb_used_triggers = 0
+
+            for(let it of instrumentsTriggers)
+            {
+              const nbs = this.triggersMenu.find(t => t.name == it).nb_sensors
+              nb_used_triggers += nbs;
+            }
+
+            return this.triggers_number - nb_used_triggers
           }
         },
         methods:
@@ -295,10 +326,10 @@
       image.src = './assets/images/snare.svg'
       image.onload = _ => 
       {
-        this.instruments.push({image: image, text: 'Snare #1'})
-        this.instruments.push({image: image, text: 'Snare #2'})
-        this.instruments.push({image: image, text: 'Snare #3'})
-        this.instruments.push({image: image, text: 'Snare #4'})
+        this.instruments.push({image: image, text: 'Snare #1', trigger: 'Dual Zone Pad'})
+        this.instruments.push({image: image, text: 'Tom #1', trigger: 'Dual Zone Pad'})
+        this.instruments.push({image: image, text: 'Floor Tom #1', trigger: 'Dual Zone Pad'})
+        this.instruments.push({image: image, text: 'Snare #2', trigger: 'Pad'})
       }
 
       // const con = this.$refs.stage.getNode().container()
