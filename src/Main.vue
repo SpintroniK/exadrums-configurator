@@ -118,11 +118,11 @@
                 </b-dropdown>
               </section>
               <section>
-                  <b-dropdown aria-role="list" v-model="selectedTriggerMenu" class="mb-3">
+                  <b-dropdown :scrollable="true" aria-role="list" v-model="selectedTriggerMenu" class="mb-3">
                     <template #trigger="{ active }">
-                        <b-button :label="selectedTriggerMenu" type="is-primary" :icon-right="active ? 'angle-up' : 'angle-down'" />
+                        <b-button :label="selectedTriggerMenu.name" type="is-primary" :icon-right="active ? 'angle-up' : 'angle-down'" />
                     </template>
-                    <b-dropdown-item v-for="(item, index) in triggersMenu" :key="index" aria-role="listitem" :value="item">{{item}}</b-dropdown-item>
+                    <b-dropdown-item v-for="(item, index) in triggersMenu" :key="index" aria-role="listitem" :value="item">{{item.name}}</b-dropdown-item>
                 </b-dropdown>
               </section>
               <b-button icon-left="plus" type="is-primary" @click="addInstrument">
@@ -211,14 +211,14 @@
           ]
 
           const triggersMenu = [
-            "Pad",
-            "Dual Zone Pad",
-            "Hi-Hat"
+            { name: "Pad", nb_triggers: 1},
+            { name: "Dual Zone Pad", nb_triggers: 2},
+            { name: "Hi-Hat", nb_triggers: 1}
           ]
 
           return {
             images: [],
-            stageSize: { width: 300, height: 300 },
+            stageSize: { width: 300, height: 480 },
             installation_method: 'package_manager',
             value: '',
             size: 120,
