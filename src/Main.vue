@@ -150,26 +150,30 @@
         </div>
         <div class="container" id="canvas-container">
           <div v-bind:style="{ height: '100%', width: '100%' }" ref="container">
-            <v-stage ref="stage" :config="stageSize">
+            <v-stage ref="stage" :config="stageSize" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown">
               <v-layer ref="layer">
                 <v-group v-for="(instrument, i) in instruments" :key="i" 
-                         :config="{ draggable: true}" @dragstart="handleDragStart" @dragend="handleDragEnd">
+                         :config="{ draggable: true }" 
+                         @dragstart="handleDragStart" @dragend="handleDragEnd">
                   <v-image :config="{
+                      name: instrument.text,
                       image: instrument.image,
                       x: 0,
                       y: 0,
                       width: 100,
                       height: 100
-                    }" />
+                    }" @transformend="handleTransformEnd" />
                   <v-text ref="text" :config="{
                       text: instrument.text,
                       x: 0,
                       y: -15,
                       fontSize: 20,
                       fontFamily: 'Calibri',
-                      fill: 'black'
+                      fill: 'black',
+                      draggable: true
                     }" />
                 </v-group>
+                <v-transformer ref="transformer" />
               </v-layer>
             </v-stage>
           </div>
@@ -248,8 +252,8 @@
             imageUrl: '',
             currentInstrument: {name: 'Snare Drum', type: 'Pad', sounds: [], triggers: []},
             selectedInstrumentMenu: instrumentsMenu[0], instrumentsMenu: instrumentsMenu,
-            selectedTriggerMenu: triggersMenu[0], triggersMenu: triggersMenu
-
+            selectedTriggerMenu: triggersMenu[0], triggersMenu: triggersMenu,
+            selectedShapeName: ''
           }
         },
         computed:
@@ -294,6 +298,72 @@
           {
             console.log(e.target.position())
           },
+          handleTransformEnd(e)
+          {
+            // shape is transformed, let us save new attrs back to the node
+            // find element in our state
+            const inst = this.instruments.find(i => i.name === this.selectedShapeName)
+            console.log(inst)
+          },
+          handleStageMouseDown(e) 
+          {
+            // clicked on stage - clear selection
+            if(e.target === e.target.getStage()) 
+            {
+              this.selectedShapeName = ''
+              this.updateTransformer()
+              return
+            }
+
+            // clicked on transformer - do nothing
+            const clickedOnTransformer = e.target.getParent().className === 'Transformer'
+            if(clickedOnTransformer) 
+            {
+              return
+            }
+
+            // find clicked rect by its name
+            const name = e.target.name()
+            const rect = this.instruments.find(i => i.text === name)
+
+            if(rect) 
+            {
+              this.selectedShapeName = name
+            } 
+            else 
+            {
+              this.selectedShapeName = ''
+            }
+
+            this.updateTransformer()
+          },
+          updateTransformer() 
+          {
+            // here we need to manually attach or detach Transformer node
+            const transformerNode = this.$refs.transformer.getNode()
+            const stage = transformerNode.getStage()
+            const { selectedShapeName } = this
+
+            const selectedNode = stage.findOne('.' + selectedShapeName)
+            console.log(selectedShapeName)
+            // do nothing if selected node is already attached
+            if(selectedNode === transformerNode.node()) 
+            {
+              return
+            }
+
+            if(selectedNode)
+            {
+              // attach to another node
+              transformerNode.nodes([selectedNode])
+            }
+            else 
+            {
+              // remove transformer
+              transformerNode.nodes([])
+            }
+            transformerNode.getLayer().batchDraw()
+          },
           changeRect() 
           {
             const container = this.$refs.container
@@ -326,10 +396,10 @@
       image.src = './assets/images/snare.svg'
       image.onload = _ => 
       {
-        this.instruments.push({image: image, text: 'Snare #1', trigger: 'Dual Zone Pad'})
-        this.instruments.push({image: image, text: 'Tom #1', trigger: 'Dual Zone Pad'})
-        this.instruments.push({image: image, text: 'Floor Tom #1', trigger: 'Dual Zone Pad'})
-        this.instruments.push({image: image, text: 'Snare #2', trigger: 'Pad'})
+        this.instruments.push({image: image, text: 'Snare1', trigger: 'Dual Zone Pad'})
+        this.instruments.push({image: image, text: 'Tom1', trigger: 'Dual Zone Pad'})
+        this.instruments.push({image: image, text: 'Floor_Tom1', trigger: 'Dual Zone Pad'})
+        this.instruments.push({image: image, text: 'Snare2', trigger: 'Pad'})
       }
 
       // const con = this.$refs.stage.getNode().container()
