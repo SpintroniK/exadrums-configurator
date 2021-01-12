@@ -240,6 +240,7 @@
 
           return {
             instruments: [],
+            images: [],
             stageSize: { width: 300, height: 480 },
             installation_method: 'package_manager',
             value: '',
@@ -248,9 +249,7 @@
             triggers_number: 8,
             generate_label: 'Generate Custom User Guide',
             show_qr_code: false,
-            toto: 'test',
-            imageUrl: '',
-            currentInstrument: {name: 'Snare Drum', type: 'Pad', sounds: [], triggers: []},
+            currentInstrument: {name: 'Snare Drum', type: 'Pad', sounds: [], triggers: [], imageName: 'snare'},
             selectedInstrumentMenu: instrumentsMenu[0], instrumentsMenu: instrumentsMenu,
             selectedTriggerMenu: triggersMenu[0], triggersMenu: triggersMenu,
             selectedShapeName: ''
@@ -283,7 +282,11 @@
           {
             
             // console.log(this.$refs.text.getNode().destroy())
-            this.$buefy.dialog.alert(`Instrument: ${this.selectedInstrumentMenu.text}<br>Trigger : ${this.selectedTriggerMenu}`)
+            // this.$buefy.dialog.alert(`Instrument: ${this.selectedInstrumentMenu.text}<br>Trigger : ${this.selectedTriggerMenu}`)
+
+            this.instruments.push({image: this.images[0].image, text: this.currentInstrument.name, trigger: 'Dual Zone Pad'})
+            //TODO: Avoid duplicate names
+            //TODO: Use valid instrument names for transformer
           },
           generate_qr_code() 
           {
@@ -296,14 +299,14 @@
           },
           handleDragEnd(e) 
           {
-            console.log(e.target.position())
+            console.log('target elements = ', e.target.children)
           },
           handleTransformEnd(e)
           {
             // shape is transformed, let us save new attrs back to the node
             // find element in our state
-            const inst = this.instruments.find(i => i.name === this.selectedShapeName)
-            console.log(inst)
+            const inst = this.instruments.find(i => i.text === this.selectedShapeName)
+            console.log('instrument = ', inst)
           },
           handleStageMouseDown(e) 
           {
@@ -392,16 +395,14 @@
       window.addEventListener("resize", this.changeRect)
       this.changeRect()
 
-      const image = new Image()
-      image.src = './assets/images/snare.svg'
-      image.onload = _ => 
-      {
-        this.instruments.push({image: image, text: 'Snare1', trigger: 'Dual Zone Pad'})
-        this.instruments.push({image: image, text: 'Tom1', trigger: 'Dual Zone Pad'})
-        this.instruments.push({image: image, text: 'Floor_Tom1', trigger: 'Dual Zone Pad'})
-        this.instruments.push({image: image, text: 'Snare2', trigger: 'Pad'})
-      }
+      const images = [{name: 'snare', src: './assets/images/snare.svg'}]
 
+      for(let im of images)
+      {
+        const image = new Image()
+        image.src = im.src
+        this.images.push({ name: im.name, image: image })
+      }
       // const con = this.$refs.stage.getNode().container()
     }
   }
