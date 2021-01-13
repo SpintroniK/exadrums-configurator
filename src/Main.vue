@@ -156,7 +156,7 @@
                          :config="{ draggable: true }" 
                          @dragstart="handleDragStart" @dragend="handleDragEnd">
                   <v-image :config="{
-                      name: instrument.text,
+                      name: toCodeName(instrument.text),
                       image: instrument.image,
                       x: 0,
                       y: 0,
@@ -249,7 +249,7 @@
             triggers_number: 8,
             generate_label: 'Generate Custom User Guide',
             show_qr_code: false,
-            currentInstrument: {name: 'Snare Drum', type: 'Pad', sounds: [], triggers: [], imageName: 'snare'},
+            currentInstrument: {name: 'Snare Drum', type: 'Pad', sounds: [], triggers: [], imageName: 'cymbal', codeName: ''},
             selectedInstrumentMenu: instrumentsMenu[0], instrumentsMenu: instrumentsMenu,
             selectedTriggerMenu: triggersMenu[0], triggersMenu: triggersMenu,
             selectedShapeName: ''
@@ -284,9 +284,13 @@
             // console.log(this.$refs.text.getNode().destroy())
             // this.$buefy.dialog.alert(`Instrument: ${this.selectedInstrumentMenu.text}<br>Trigger : ${this.selectedTriggerMenu}`)
 
-            this.instruments.push({image: this.images[0].image, text: this.currentInstrument.name, trigger: 'Dual Zone Pad'})
+            this.instruments.push({image: this.images[1].image, text: this.currentInstrument.name, trigger: 'Dual Zone Pad'})
             //TODO: Avoid duplicate names
             //TODO: Use valid instrument names for transformer
+          },
+          toCodeName(s)
+          {
+            return s.replace(/\s+/g, '')
           },
           generate_qr_code() 
           {
@@ -305,7 +309,7 @@
           {
             // shape is transformed, let us save new attrs back to the node
             // find element in our state
-            const inst = this.instruments.find(i => i.text === this.selectedShapeName)
+            const inst = this.instruments.find(i => this.toCodeName(i.text) === this.selectedShapeName)
             console.log('instrument = ', inst)
           },
           handleStageMouseDown(e) 
@@ -327,7 +331,7 @@
 
             // find clicked rect by its name
             const name = e.target.name()
-            const rect = this.instruments.find(i => i.text === name)
+            const rect = this.instruments.find(i => this.toCodeName(i.text) === name)
 
             if(rect) 
             {
@@ -395,7 +399,8 @@
       window.addEventListener("resize", this.changeRect)
       this.changeRect()
 
-      const images = [{name: 'snare', src: './assets/images/snare.svg'}]
+      const images = [{name: 'snare', src: './assets/images/snare.svg'},
+                      {name: 'cymbal', src: './assets/images/cymbal.svg'}]
 
       for(let im of images)
       {
