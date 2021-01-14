@@ -226,10 +226,10 @@
         data() 
         {
           const instrumentsMenu = [
-            { icon: 'drum', text: 'Snare Drum' },
-            { icon: 'drum', text: 'Bass Drum' },
-            { icon: 'drum', text: 'Tom' },
-            { icon: 'record-vinyl', text: 'Cymbal' }
+            { icon: 'drum', text: 'Snare Drum', imageName: 'snare' },
+            { icon: 'drum', text: 'Bass Drum', imageName: 'snare' },
+            { icon: 'drum', text: 'Tom', imageName: 'snare' },
+            { icon: 'record-vinyl', text: 'Cymbal', imageName: 'cymbal' }
           ]
 
           const triggersMenu = [
@@ -283,10 +283,10 @@
             
             // console.log(this.$refs.text.getNode().destroy())
             // this.$buefy.dialog.alert(`Instrument: ${this.selectedInstrumentMenu.text}<br>Trigger : ${this.selectedTriggerMenu}`)
-
-            this.instruments.push({image: this.images[1].image, text: this.currentInstrument.name, trigger: 'Dual Zone Pad'})
+            const instrument = this.instrumentsMenu.find(i => i.text === this.selectedInstrumentMenu.text)
+            const currentImage = this.images.find(i => i.name === instrument.imageName).image
+            this.instruments.push({image: currentImage, text: this.currentInstrument.name, trigger: 'Dual Zone Pad'})
             //TODO: Avoid duplicate names
-            //TODO: Use valid instrument names for transformer
           },
           toCodeName(s)
           {
