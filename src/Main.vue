@@ -93,23 +93,8 @@
           <div class="column">
             <section class="section">
               Number of triggers left: {{nbTriggersLeft}}
-                  <section class="mt-3">
-                    <b-collapse class="card" animation="slide" aria-id="contentIdForA11y3">
-                      <template #trigger="props">
-                          <div class="card-header" role="button" aria-controls="contentIdForA11y3">
-                              <p class="card-header-title">
-                                  Instruments
-                              </p>
-                              <a class="card-header-icon">
-                                  <b-icon :icon="props.open ? 'angle-down' : 'angle-up'"></b-icon>
-                              </a>
-                            </div>
-                        </template>
-                      <section class="m-3" v-for="(instrument, i) in instruments" :key="i">
-                        {{instrument.text}}
-                      </section>
-                    </b-collapse>
-                </section>
+                <b-taginput :value="instrumentsNames" @input="removeInstrument">
+              </b-taginput>
             </section>
           </div>
           <div class="column">
@@ -227,7 +212,7 @@
         {
           const instrumentsMenu = [
             { icon: 'drum', text: 'Snare Drum', imageName: 'snare' },
-            { icon: 'drum', text: 'Bass Drum', imageName: 'snare' },
+            { icon: 'drum', text: 'Bass Drum', imageName: 'bassdrum' },
             { icon: 'drum', text: 'Tom', imageName: 'snare' },
             { icon: 'record-vinyl', text: 'Cymbal', imageName: 'cymbal' }
           ]
@@ -274,19 +259,43 @@
             }
 
             return this.triggers_number - nb_used_triggers
+          },
+          instrumentsNames()
+          {
+            return this.instruments.map(i => i.text)
           }
         },
         methods:
         {
-          addInstrument() 
+          removeInstrument(a)
+          {
+            this.instruments = this.instruments.filter(i => a.includes(i.text))
+          },
+          addInstrument()
           {
             
             // console.log(this.$refs.text.getNode().destroy())
             // this.$buefy.dialog.alert(`Instrument: ${this.selectedInstrumentMenu.text}<br>Trigger : ${this.selectedTriggerMenu}`)
-            const instrument = this.instrumentsMenu.find(i => i.text === this.selectedInstrumentMenu.text)
-            const currentImage = this.images.find(i => i.name === instrument.imageName).image
-            this.instruments.push({image: currentImage, text: this.currentInstrument.name, trigger: 'Dual Zone Pad'})
-            //TODO: Avoid duplicate names
+
+            // Avoid duplicate names
+            if(this.instrumentsNames.includes(this.currentInstrument.name))
+            {
+              this.$buefy.dialog.alert({
+                  title: 'Error',
+                  message: 'An instrument with the same name already exists.',
+                  type: 'is-danger',
+                  hasIcon: true,
+                  icon: 'times-circle',
+                  iconPack: 'fa',
+                  ariaRole: 'alertdialog',
+                  ariaModal: true})
+            }
+            else
+            {
+              const instrument = this.instrumentsMenu.find(i => i.text === this.selectedInstrumentMenu.text)
+              const currentImage = this.images.find(i => i.name === instrument.imageName).image
+              this.instruments.push({image: currentImage, text: this.currentInstrument.name, trigger: 'Pad'})
+            }
           },
           toCodeName(s)
           {
@@ -400,7 +409,8 @@
       this.changeRect()
 
       const images = [{name: 'snare', src: './assets/images/snare.svg'},
-                      {name: 'cymbal', src: './assets/images/cymbal.svg'}]
+                      {name: 'cymbal', src: './assets/images/cymbal.svg'},
+                      {name: 'bassdrum', src: './assets/images/bassdrum.svg'}]
 
       for(let im of images)
       {
