@@ -4,7 +4,7 @@
         <div class="hero-body">
           <div class="container">
             <h1 class="title">
-              eXaDrums Customizer
+              eXaDrums Configurator
             </h1>
             <h2 class="subtitle">
               Configure your drum module
@@ -23,7 +23,7 @@
       </section>
   
       <div class="container has-text-centered">
-        <h1 class="title">Software</h1>
+        <h1 class="title">Software Installation</h1>
       </div>
       <div class="container">
         <div class="columns has-text-justified">
@@ -44,6 +44,8 @@
                         <b-icon icon="box-open"></b-icon>
                         <span>Package manager</span>
                     </b-radio-button>
+                  </b-field>
+                  <b-field v-if="software_guidelines">
                     <b-radio-button v-model="installation_method" native-value="from_source">
                         <b-icon icon="cogs"></b-icon>
                         <span>Build from source</span>
@@ -55,6 +57,46 @@
         </div>
       </div>
 
+      <div class="container has-text-centered">
+        <h1 class="title">User Interface</h1>
+      </div>
+      <div class="container">
+        <div class="columns has-text-justified">
+          <div class="column">
+            <section class="section">
+             EXaDrums uses a touchscreen interface, and also works on a desktop environment, 
+             but the user interface is optional and you can also choose to develop your own.
+             The native interface uses GTK, which means that it looks like most Linux software.
+             The modern interface uses Electron, it is more dynbamic than the native interface, 
+             and provides a lot more features.
+
+            </section>
+          </div>
+          <div class="column">
+            <section class="section">
+              <div class="field">
+                <b-switch v-model="include_ui">Include user interface.</b-switch><br><br>
+                <span v-if="include_ui">User Interface type: </span>
+                <b-field>
+                  <b-radio-button v-if="include_ui" v-model="uiType" native-value="native">
+                      <b-icon icon="desktop"></b-icon>
+                      <span>Native (GTK)</span>
+                  </b-radio-button>
+                </b-field>
+                <b-tooltip style="width: 100%" label="Not available, yet..." position="is-bottom">
+                  <b-field  v-if="include_ui" style="width: 100%;">
+                    <b-radio-button v-model="uiType" native-value="modern" disabled>
+                        <b-icon icon="tablet-alt"></b-icon>
+                        <span>Modern (Electron)</span>
+                    </b-radio-button>
+                  </b-field>
+                </b-tooltip>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+  
       <div class="container has-text-centered">
         <h1 class="title">Triggers</h1>
       </div>
@@ -74,93 +116,98 @@
                       <b-icon icon="drum"></b-icon>
                       <span>8 Triggers</span>
                   </b-radio-button>
-                  <b-radio-button v-model="nbTriggers" native-value="16" disabled>
-                      <b-icon icon="drum"></b-icon>
-                      <span>16 Triggers</span>
-                  </b-radio-button>
                 </b-field>
+                <b-tooltip style="width: 100%" label="Not available, yet..." position="is-bottom">
+                  <b-field style="width: 100%;">
+                    <b-radio-button v-model="nbTriggers" native-value="16" disabled>
+                        <b-icon icon="drum"></b-icon>
+                        <span>16 Triggers</span>
+                    </b-radio-button>
+                  </b-field>
+                </b-tooltip>
               </div>
             </section>
           </div>
         </div>
       </div>
-
-      <div class="container has-text-centered">
-        <h1 class="title">Customize your kit</h1>
-      </div>
-      <div class="container">
-        <div class="columns has-text-justified">
-          <div class="column">
-            <section class="section">
-              Number of triggers left: {{nbTriggersLeft}}
-                <b-taginput :value="instrumentsNames" @input="removeInstrument">
-              </b-taginput>
-            </section>
-          </div>
-          <div class="column">
-            <section class="section">
-              <h2 class="subtitle">Add instrument</h2>
-              <b-field label="Name">
-                  <b-input v-model="currentInstrument.name"></b-input>
-              </b-field>
-              <section>
-                <b-dropdown :scrollable="true" v-model="selectedInstrumentMenu" aria-role="list" class="mb-3">
-                    <template #trigger="{ active }">
-                        <b-button :label="selectedInstrumentMenu.text" type="is-primary" :icon-left="selectedInstrumentMenu.icon" 
-                                  :icon-right="active ? 'angle-up' : 'angle-down'" />
-                    </template>
-                    <b-dropdown-item v-for="(menu, index) in instrumentsMenu" :key="index" :value="menu" aria-role="listitem">
-                        <div class="media">
-                            <b-icon class="media-left" :icon="menu.icon"></b-icon>
-                            <div class="media-content">
-                                <h3>{{menu.text}}</h3>
-                            </div>
-                        </div>
-                    </b-dropdown-item>
-                </b-dropdown>
-              </section>
-              <section>
-                  <b-dropdown :scrollable="true" aria-role="list" v-model="selectedTriggerMenu" class="mb-3">
-                    <template #trigger="{ active }">
-                        <b-button :label="selectedTriggerMenu.name" type="is-primary" :icon-right="active ? 'angle-up' : 'angle-down'" />
-                    </template>
-                    <b-dropdown-item v-for="(item, index) in triggersMenu" :key="index" aria-role="listitem" :value="item">{{item.name}}</b-dropdown-item>
-                </b-dropdown>
-              </section>
-              <b-button icon-left="plus" type="is-primary" @click="addInstrument" :disabled="nbTriggersLeft - selectedTriggerMenu.nb_sensors < 0">
-                  Add
-              </b-button>
-            </section>
-          </div>
+      <div v-if="false">
+        <div class="container has-text-centered">
+          <h1 class="title">Customize your kit</h1>
         </div>
-        <div class="container" id="canvas-container">
-          <div v-bind:style="{ height: '100%', width: '100%' }" ref="container">
-            <v-stage ref="stage" :config="stageSize" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown">
-              <v-layer ref="layer">
-                <v-group v-for="(instrument, i) in instruments" :key="i" 
-                         :config="{ draggable: true }" 
-                         @dragstart="handleDragStart" @dragend="handleDragEnd">
-                  <v-image :config="{
-                      name: toCodeName(instrument.text),
-                      image: instrument.image,
-                      x: 0,
-                      y: 0,
-                      width: 100,
-                      height: 100
-                    }" @transformend="handleTransformEnd" />
-                  <v-text ref="text" :config="{
-                      text: instrument.text,
-                      x: 0,
-                      y: -15,
-                      fontSize: 20,
-                      fontFamily: 'Calibri',
-                      fill: 'black',
-                      draggable: true
-                    }" />
-                </v-group>
-                <v-transformer ref="transformer" />
-              </v-layer>
-            </v-stage>
+        <div class="container">
+          <div class="columns has-text-justified">
+            <div class="column">
+              <section class="section">
+                Number of triggers left: {{nbTriggersLeft}}
+                  <b-taginput :value="instrumentsNames" @input="removeInstrument">
+                </b-taginput>
+              </section>
+            </div>
+            <div class="column">
+              <section class="section">
+                <h2 class="subtitle">Add instrument</h2>
+                <b-field label="Name">
+                    <b-input v-model="currentInstrument.name"></b-input>
+                </b-field>
+                <section>
+                  <b-dropdown :scrollable="true" v-model="selectedInstrumentMenu" aria-role="list" class="mb-3">
+                      <template #trigger="{ active }">
+                          <b-button :label="selectedInstrumentMenu.text" type="is-primary" :icon-left="selectedInstrumentMenu.icon" 
+                                    :icon-right="active ? 'angle-up' : 'angle-down'" />
+                      </template>
+                      <b-dropdown-item v-for="(menu, index) in instrumentsMenu" :key="index" :value="menu" aria-role="listitem">
+                          <div class="media">
+                              <b-icon class="media-left" :icon="menu.icon"></b-icon>
+                              <div class="media-content">
+                                  <h3>{{menu.text}}</h3>
+                              </div>
+                          </div>
+                      </b-dropdown-item>
+                  </b-dropdown>
+                </section>
+                <section>
+                    <b-dropdown :scrollable="true" aria-role="list" v-model="selectedTriggerMenu" class="mb-3">
+                      <template #trigger="{ active }">
+                          <b-button :label="selectedTriggerMenu.name" type="is-primary" :icon-right="active ? 'angle-up' : 'angle-down'" />
+                      </template>
+                      <b-dropdown-item v-for="(item, index) in triggersMenu" :key="index" aria-role="listitem" :value="item">{{item.name}}</b-dropdown-item>
+                  </b-dropdown>
+                </section>
+                <b-button icon-left="plus" type="is-primary" @click="addInstrument" :disabled="nbTriggersLeft - selectedTriggerMenu.nb_sensors < 0">
+                    Add
+                </b-button>
+              </section>
+            </div>
+          </div>
+          <div class="container" id="canvas-container">
+            <div v-bind:style="{ height: '100%', width: '100%' }" ref="container">
+              <v-stage ref="stage" :config="stageSize" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown">
+                <v-layer ref="layer">
+                  <v-group v-for="(instrument, i) in instruments" :key="i" 
+                          :config="{ draggable: true }" 
+                          @dragstart="handleDragStart" @dragend="handleDragEnd">
+                    <v-image :config="{
+                        name: toCodeName(instrument.text),
+                        image: instrument.image,
+                        x: 0,
+                        y: 0,
+                        width: 100,
+                        height: 100
+                      }" @transformend="handleTransformEnd" />
+                    <v-text ref="text" :config="{
+                        text: instrument.text,
+                        x: 0,
+                        y: -15,
+                        fontSize: 20,
+                        fontFamily: 'Calibri',
+                        fill: 'black',
+                        draggable: true
+                      }" />
+                  </v-group>
+                  <v-transformer ref="transformer" />
+                </v-layer>
+              </v-stage>
+            </div>
           </div>
         </div>
       </div>
@@ -207,6 +254,8 @@
 
   import QrcodeVue from 'qrcode.vue'
 
+  const codec = require('json-url')('lzw')
+
     export default {
         data() 
         {
@@ -228,9 +277,11 @@
             images: [],
             stageSize: { width: 300, height: 480 },
             installation_method: 'package_manager',
+            uiType: 'native',
             value: '',
             size: 120,
             software_guidelines: true,
+            include_ui: true,
             triggers_number: 8,
             generate_label: 'Generate Custom User Guide',
             show_qr_code: false,
@@ -242,6 +293,10 @@
         },
         computed:
         {
+          generateUrl()
+          {
+            
+          },
           nbTriggers()
           {
             return this.triggers_number.toString()
