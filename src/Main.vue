@@ -17,7 +17,7 @@
           <h1 class="title">Get Ready!</h1>
           <div class="block">
             This page is there to help you customize your drum module.
-            After you answer a few questions to get a custom user guide so that you can start building your drum kit. 
+            Answer a few questions to get a custom user guide so that you can start building your drum kit. 
           </div>
         </div>
       </section>
