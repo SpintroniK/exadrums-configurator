@@ -77,7 +77,9 @@ if(!dev)
 
     appConfig.plugins.push(new CopyPlugin(
     {
-        patterns: [{ from: path.join(__dirname, 'assets'), to: path.join(__dirname, 'dist', 'assets') }],
+        patterns: [{ from: path.join(__dirname, 'assets'), to: path.join(__dirname, 'dist', 'assets') }, 
+                   { from: path.join(__dirname, 'favicon.ico'), to: path.join(__dirname, 'dist', 'favicon.ico') },
+                  ],
         options: { concurrency: 100 }
     }))
 
