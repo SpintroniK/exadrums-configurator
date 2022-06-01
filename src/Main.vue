@@ -130,7 +130,7 @@
           </div>
         </div>
       </div>
-      <div v-if="false">
+      <div v-if="true">
         <div class="container has-text-centered">
           <h1 class="title">Customize your kit</h1>
         </div>
@@ -180,7 +180,7 @@
             </div>
           </div>
           <div class="container" id="canvas-container">
-            <div v-bind:style="{ height: '100%', width: '100%' }" ref="container">
+            <div v-bind:style="{ height: '100%', width: '100%' , border: '1px solid black'}" ref="container">
               <v-stage ref="stage" :config="stageSize" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown">
                 <v-layer ref="layer">
                   <v-group v-for="(instrument, i) in instruments" :key="i" 
@@ -275,7 +275,7 @@
           return {
             instruments: [],
             images: [],
-            stageSize: { width: 300, height: 480 },
+            stageSize: { width: 200, height: 300 },
             installation_method: 'package_manager',
             uiType: 'native',
             value: '',
@@ -367,13 +367,16 @@
           },
           handleDragEnd(e) 
           {
-            console.log('target elements = ', e.target.children)
+            console.log(e.target)
+            // console.log('target elements = ', e.target.x(20))
           },
           handleTransformEnd(e)
           {
             // shape is transformed, let us save new attrs back to the node
             // find element in our state
+
             const inst = this.instruments.find(i => this.toCodeName(i.text) === this.selectedShapeName)
+            
             console.log('instrument = ', inst)
           },
           handleStageMouseDown(e) 
@@ -416,7 +419,7 @@
             const { selectedShapeName } = this
 
             const selectedNode = stage.findOne('.' + selectedShapeName)
-            console.log(selectedShapeName)
+            console.log(`Selected shape name = ${selectedShapeName}`)
             // do nothing if selected node is already attached
             if(selectedNode === transformerNode.node()) 
             {
@@ -445,11 +448,21 @@
             const height = container.offsetHeight
             const width = container.offsetWidth
 
-            // console.log(height, height)
-            this.stageSize.width = width
-            this.stageSize.height = height
+            const dx = width - this.stageSize.width
 
-            // console.log(this.$refs.layer.getNode().children[0].position())
+            this.stageSize.width = width
+            this.stageSize.height = width*0.5
+
+            const transformerNode = this.$refs.transformer.getNode()
+            const stage = transformerNode.getStage()
+
+            const selectedNode = stage.findOne('.SnareDrum')
+
+            if(selectedNode)
+            {
+              console.log(`Selected node = ${selectedNode}`)
+              selectedNode.parent.x(selectedNode.parent.x() + dx)
+            }
      
           }
         },
